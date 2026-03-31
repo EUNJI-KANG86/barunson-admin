@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barunson Atelier — 어드민</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#1a1714;--cream:#f5f0e8;--gold:#b8965a;--warm-gray:#8a8078;
+  --white:#fdfaf5;--border:#e2ddd4;--success:#3B6D11;--danger:#A32D2D;
+  --bg:#f8f5f0;
+}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+
+/* LOGIN */
+#login-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--ink);
+}
+.login-box{
+  background:var(--white);padding:48px 40px;width:380px;
+  border:0.5px solid rgba(184,150,90,0.3);
+}
+.login-logo{
+  font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;
+  text-align:center;margin-bottom:8px;letter-spacing:0.1em;
+}
+.login-sub{font-size:11px;color:var(--warm-gray);text-align:center;letter-spacing:0.15em;margin-bottom:32px}
+.login-box label{font-size:12px;color:var(--warm-gray);display:block;margin-bottom:6px;letter-spacing:0.05em}
+.login-box input[type=password]{
+  width:100%;padding:12px 14px;border:0.5px solid var(--border);
+  font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--white);
+  margin-bottom:20px;outline:none;
+}
+.login-box input[type=password]:focus{border-color:var(--gold)}
+.login-btn{
+  width:100%;padding:14px;background:var(--ink);color:var(--white);
+  border:none;font-size:13px;letter-spacing:0.1em;cursor:pointer;
+  font-family:'Noto Sans KR',sans-serif;font-weight:400;
+  transition:background 0.2s;
+}
+.login-btn:hover{background:#2d2926}
+.login-error{font-size:12px;color:var(--danger);text-align:center;margin-top:12px;display:none}
+
+/* ADMIN LAYOUT */
+#admin-screen{display:none}
+.admin-wrap{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{background:var(--ink);padding:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:0.5px solid rgba(255,255,255,0.1)}
+.sidebar-logo-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--white);letter-spacing:0.1em}
+.sidebar-logo-sub{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:0.15em;margin-top:4px}
+.sidebar-nav{padding:16px 0}
+.nav-section{padding:8px 24px 4px;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.2em;text-transform:uppercase}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:11px 24px;
+  font-size:13px;color:rgba(255,255,255,0.6);cursor:pointer;
+  transition:all 0.15s;border-left:2px solid transparent;
+}
+.nav-item:hover{color:var(--white);background:rgba(255,255,255,0.05)}
+.nav-item.active{color:var(--gold);border-left-color:var(--gold);background:rgba(184,150,90,0.08)}
+.nav-icon{font-size:14px;width:18px;text-align:center}
+.sidebar-footer{padding:20px 24px;border-top:0.5px solid rgba(255,255,255,0.1);margin-top:auto}
+.logout-btn{
+  width:100%;padding:10px;border:0.5px solid rgba(255,255,255,0.2);
+  background:transparent;color:rgba(255,255,255,0.5);font-size:12px;
+  cursor:pointer;letter-spacing:0.1em;font-family:'Noto Sans KR',sans-serif;
+  transition:all 0.2s;
+}
+.logout-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* MAIN */
+.admin-main{padding:32px 40px;overflow-y:auto}
+.page-header{margin-bottom:28px;padding-bottom:20px;border-bottom:0.5px solid var(--border)}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;margin-bottom:4px}
+.page-desc{font-size:13px;color:var(--warm-gray)}
+
+/* PANELS */
+.panel{background:var(--white);border:0.5px solid var(--border);padding:24px;margin-bottom:20px}
+.panel-title{font-size:14px;font-weight:500;margin-bottom:16px;padding-bottom:12px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:8px}
+.panel-title-icon{color:var(--gold)}
+
+/* FORM */
+.form-row{margin-bottom:16px}
+.form-label{font-size:12px;color:var(--warm-gray);display:block;margin-bottom:6px;letter-spacing:0.03em}
+.form-input,.form-textarea,.form-select{
+  width:100%;padding:10px 12px;border:0.5px solid var(--border);
+  font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--white);
+  outline:none;transition:border-color 0.15s;color:var(--ink);
+}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--gold)}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.6}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* BUTTONS */
+.btn{padding:10px 20px;font-size:12px;letter-spacing:0.08em;cursor:pointer;font-family:'Noto Sans KR',sans-serif;border:none;transition:all 0.2s}
+.btn-primary{background:var(--ink);color:var(--white)}
+.btn-primary:hover{background:#2d2926}
+.btn-gold{background:var(--gold);color:var(--white)}
+.btn-gold:hover{background:#a07840}
+.btn-outline{background:transparent;border:0.5px solid var(--border);color:var(--ink)}
+.btn-outline:hover{border-color:var(--ink)}
+.btn-danger{background:transparent;border:0.5px solid #E24B4A;color:#A32D2D;font-size:11px;padding:6px 12px}
+.btn-danger:hover{background:#fcebeb}
+.btn-sm{padding:7px 14px;font-size:11px}
+.btn-row{display:flex;gap:10px;margin-top:20px}
+
+/* IMAGE UPLOAD */
+.img-upload-area{
+  border:1px dashed var(--border);padding:24px;text-align:center;
+  cursor:pointer;transition:border-color 0.2s;position:relative;overflow:hidden;
+}
+.img-upload-area:hover{border-color:var(--gold)}
+.img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.img-upload-icon{font-size:24px;margin-bottom:8px;color:var(--warm-gray)}
+.img-upload-text{font-size:12px;color:var(--warm-gray)}
+.img-preview{width:100%;max-height:200px;object-fit:cover;display:none;margin-top:12px}
+
+/* COLLECTION CARDS */
+.collection-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.collection-card{border:0.5px solid var(--border);background:var(--white);overflow:hidden}
+.collection-card-img{
+  height:140px;background:var(--cream);display:flex;align-items:center;
+  justify-content:center;font-size:32px;position:relative;overflow:hidden;
+}
+.collection-card-img img{width:100%;height:100%;object-fit:cover;display:none}
+.collection-card-body{padding:14px}
+.collection-card-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.collection-card-price{font-size:12px;color:var(--warm-gray);margin-bottom:10px}
+.collection-card-actions{display:flex;gap:8px}
+
+/* REVIEW CARDS */
+.review-item{border:0.5px solid var(--border);padding:16px;margin-bottom:12px}
+.review-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.review-stars{color:var(--gold);font-size:13px}
+.review-name{font-size:12px;color:var(--warm-gray);margin-top:2px}
+.review-text{font-size:13px;line-height:1.7;color:var(--ink)}
+.add-review-form{border:0.5px dashed var(--border);padding:20px;margin-top:16px}
+
+/* PROCESS */
+.process-item{display:grid;grid-template-columns:40px 1fr;gap:16px;align-items:start;margin-bottom:16px;padding-bottom:16px;border-bottom:0.5px solid var(--border)}
+.process-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.process-num{width:40px;height:40px;background:var(--ink);color:var(--white);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;flex-shrink:0}
+
+/* TABS */
+.tab-section{display:none}
+.tab-section.active{display:block}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;background:var(--ink);color:var(--white);
+  padding:12px 20px;font-size:13px;z-index:9999;opacity:0;
+  transition:opacity 0.3s;pointer-events:none;
+}
+.toast.show{opacity:1}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--white);border:0.5px solid var(--border);padding:20px}
+.stat-label{font-size:11px;color:var(--warm-gray);letter-spacing:0.05em;margin-bottom:8px}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400}
+.stat-sub{font-size:11px;color:var(--warm-gray);margin-top:4px}
+
+/* BADGE */
+.badge{display:inline-block;padding:3px 8px;font-size:10px;letter-spacing:0.05em}
+.badge-gold{background:rgba(184,150,90,0.1);color:var(--gold);border:0.5px solid rgba(184,150,90,0.3)}
+
+/* PREVIEW LINK */
+.preview-link{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 18px;
+  border:0.5px solid var(--border);font-size:12px;color:var(--ink);
+  text-decoration:none;letter-spacing:0.05em;transition:all 0.2s;
+}
+.preview-link:hover{border-color:var(--gold);color:var(--gold)}
+
+@media(max-width:768px){
+  .admin-wrap{grid-template-columns:1fr}
+  .sidebar{height:auto;position:static}
+  .admin-main{padding:20px}
+  .stats-grid,.collection-grid,.form-grid,.form-grid-3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">BARUNSON ATELIER</div>
+    <div class="login-sub">ADMIN DASHBOARD</div>
+    <label>비밀번호</label>
+    <input type="password" id="pw-input" placeholder="비밀번호를 입력하세요" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">로그인</button>
+    <div class="login-error" id="login-error">비밀번호가 올바르지 않습니다</div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-screen">
+<div class="admin-wrap">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-title">BARUNSON ATELIER</div>
+      <div class="sidebar-logo-sub">ADMIN</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">대시보드</div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)">
+        <span class="nav-icon">◈</span> 홈
+      </div>
+      <div class="nav-section">콘텐츠 관리</div>
+      <div class="nav-item" onclick="showTab('main',this)">
+        <span class="nav-icon">◇</span> 메인 문구
+      </div>
+      <div class="nav-item" onclick="showTab('collections',this)">
+        <span class="nav-icon">◻</span> 컬렉션
+      </div>
+      <div class="nav-item" onclick="showTab('process',this)">
+        <span class="nav-icon">◈</span> 프로세스
+      </div>
+      <div class="nav-item" onclick="showTab('reviews',this)">
+        <span class="nav-icon">◇</span> 고객 후기
+      </div>
+      <div class="nav-section">설정</div>
+      <div class="nav-item" onclick="showTab('contact',this)">
+        <span class="nav-icon">◻</span> 연락처·SNS
+      </div>
+      <div class="nav-item" onclick="showTab('password',this)">
+        <span class="nav-icon">◈</span> 비밀번호 변경
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-main">
+
+    <!-- DASHBOARD -->
+    <div id="tab-dashboard" class="tab-section active">
+      <div class="page-header">
+        <div class="page-title">대시보드</div>
+        <div class="page-desc">바른손 아틀리에 어드민에 오신 것을 환영합니다</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">컬렉션 수</div>
+          <div class="stat-value" id="stat-collections">6</div>
+          <div class="stat-sub">등록된 컬렉션</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">고객 후기</div>
+          <div class="stat-value" id="stat-reviews">3</div>
+          <div class="stat-sub">등록된 후기</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">프로세스 단계</div>
+          <div class="stat-value">4</div>
+          <div class="stat-sub">제작 프로세스</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">마지막 저장</div>
+          <div class="stat-value" style="font-size:18px" id="stat-lastSave">—</div>
+          <div class="stat-sub">자동 저장</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title"><span class="panel-title-icon">◈</span> 빠른 메뉴</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="https://eunji-kang86.github.io/barunson-atelier/" target="_blank" class="preview-link">🔗 사이트 미리보기</a>
+          <button class="btn btn-outline" onclick="showTab('collections',document.querySelector('.nav-item:nth-child(5)'))">컬렉션 관리</button>
+          <button class="btn btn-outline" onclick="showTab('reviews',document.querySelector('.nav-item:nth-child(7)'))">후기 관리</button>
+          <button class="btn btn-gold" onclick="saveAll()">전체 저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN TEXT -->
+    <div id="tab-main" class="tab-section">
+      <div class="page-header">
+        <div class="page-title">메인 문구 관리</div>
+        <div class="page-desc">사이트 메인 페이지의 타이틀과 소개 문구를 수정합니다</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title"><span class="panel-title-icon">◇</span> 히어로 섹션</div>
+        <div class="form-row">
+          <label class="form-label">메인 타이틀 (영문)</label>
+          <input class="form-input" id="hero-title" value="Your Love Story, Perfectly Crafted">
+        </div>
+        <div class="form-row">
+          <label class="form-label">서브 타이틀</label>
+          <input class="form-input" id="hero-subtitle" value="세상에 하나뿐인 청첩장">
+        </div>
+        <div class="form-row">
+          <label class="form-label">소개 문구</label>
+          <textarea class="form-textarea" id="hero-desc">전담 디자이너가 두 분의 이야기를 담아 특별하게 완성해드립니다.</textarea>
+        </div>
+        <div class="form-row">
+          <label class="form-label">히어로 이미지</label>
+          <div class="img-upload-area" onclick="triggerUpload('hero-img-input')">
+            <input type="file" id="hero-img-input" accept="image/*" onchange="previewImage(this,'hero-img-preview')">
+            <div class="img-upload-icon">🖼</div>
+            <div class="img-upload-text">클릭하여 이미지 업로드<br><span style="font-size:11px;opacity:0.6">권장: 1920×1080px</span></div>
+            <img id="hero-img-preview" class="img-preview">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveSection('메인 문구')">저장</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><span class="panel-title-icon">◇</span> 통계 문구</div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="form-label">Couples Served</label>
+            <input class="form-input" id="stat-couples" value="2,400+">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Avg Rating</label>
+            <input class="form-input" id="stat-rating" value="4.9">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Production Days</label>
+            <input class="form-input" id="stat-days" value="7~10">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Customizable</label>
+            <input class="form-input" id="stat-custom" value="100%">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveSection('통계 문구')">저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLLECTIONS -->
+    <div id="tab-collections" class="tab-section">
+      <div class="page-header">
+        <div class="page-title">컬렉션 관리</div>
+        <div class="page-desc">청첩장 컬렉션의 이미지, 이름, 가격을 수정합니다</div>
+      </div>
+      <div class="collection-grid" id="collection-grid"></div>
+      <div style="margin-top:20px">
+        <button class="btn btn-gold" onclick="addCollection()">+ 컬렉션 추가</button>
+      </div>
+    </div>
+
+    <!-- PROCESS -->
+    <div id="tab-process" class="tab-section">
+      <div class="page-header">
+        <div class="page-title">프로세스 관리</div>
+        <div class="page-desc">1:1 맞춤 제작 프로세스 단계별 내용을 수정합니다</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title"><span class="panel-title-icon">◈</span> 프로세스 단계</div>
+        <div id="process-list"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveSection('프로세스')">저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div id="tab-reviews" class="tab-section">
+      <div class="page-header">
+        <div class="page-title">고객 후기 관리</div>
+        <div class="page-desc">고객 후기를 추가, 수정, 삭제합니다</div>
+      </div>
+      <div id="review-list"></div>
+      <div class="add-review-form">
+        <div style="font-size:13px;font-weight:500;margin-bottom:16px">+ 새 후기 추가</div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="form-label">고객 이름</label>
+            <input class="form-input" id="new-review-name" placeholder="김*연 & 이*호">
+          </div>
+          <div class="form-row">
+            <label class="form-label">예식 날짜 & 컬렉션</label>
+            <input class="form-input" id="new-review-date" placeholder="2026.02 | Rosé Garden">
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">후기 내용</label>
+          <textarea class="form-textarea" id="new-review-text" placeholder="후기 내용을 입력하세요"></textarea>
+        </div>
+        <button class="btn btn-gold" onclick="addReview()">후기 추가</button>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div id="tab-contact" class="tab-section">
+      <div class="page-header">
+        <div class="page-title">연락처·SNS 관리</div>
+        <div class="page-desc">푸터에 표시되는 연락처와 SNS 정보를 수정합니다</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title"><span class="panel-title-icon">◻</span> 연락처 정보</div>
+        <div class="form-row">
+          <label class="form-label">상담 전화</label>
+          <input class="form-input" id="contact-phone" value="02-1234-5678">
+        </div>
+        <div class="form-row">
+          <label class="form-label">인스타그램</label>
+          <input class="form-input" id="contact-insta" value="@barunson-atelier">
+        </div>
+        <div class="form-row">
+          <label class="form-label">이메일</label>
+          <input class="form-input" id="contact-email" placeholder="이메일 주소">
+        </div>
+        <div class="form-row">
+          <label class="form-label">카카오톡 채널</label>
+          <input class="form-input" id="contact-kakao" placeholder="카카오톡 채널명">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveSection('연락처')">저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSWORD -->
+    <div id="tab-password" class="tab-section">
+      <div class="page-header">
+        <div class="page-title">비밀번호 변경</div>
+        <div class="page-desc">어드민 로그인 비밀번호를 변경합니다</div>
+      </div>
+      <div class="panel" style="max-width:400px">
+        <div class="panel-title"><span class="panel-title-icon">◈</span> 비밀번호 변경</div>
+        <div class="form-row">
+          <label class="form-label">현재 비밀번호</label>
+          <input type="password" class="form-input" id="pw-current">
+        </div>
+        <div class="form-row">
+          <label class="form-label">새 비밀번호</label>
+          <input type="password" class="form-input" id="pw-new">
+        </div>
+        <div class="form-row">
+          <label class="form-label">새 비밀번호 확인</label>
+          <input type="password" class="form-input" id="pw-confirm">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="changePassword()">변경하기</button>
+        </div>
+        <div id="pw-msg" style="font-size:12px;margin-top:12px"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+let PW = localStorage.getItem('atelier_pw') || 'barunson2026';
+
+const defaultCollections = [
+  {emoji:'🌹',name:'Rosé Garden',price:'2,200원~ 3,000원',tags:'Watercolor · Floral · Gold Foil',img:''},
+  {emoji:'🌿',name:'Sage & Eucalyptus',price:'1,800원~ 2,500원',tags:'Botanical · Letterpress',img:''},
+  {emoji:'🌌',name:'Midnight Luxe',price:'2,800원~ 3,800원',tags:'Gold Foil · Emboss · Velvet',img:''},
+  {emoji:'✨',name:'Golden Hour',price:'2,500원~ 3,500원',tags:'Classic · Gold Foil · Silk Ribbon',img:''},
+  {emoji:'🖤',name:'Monochrome',price:'1,600원~ 2,200원',tags:'Minimal · Typography',img:''},
+  {emoji:'🌸',name:'Blush Peony',price:'2,000원~ 2,800원',tags:'Peony · Emboss · Ribbon',img:''},
+];
+
+const defaultProcess = [
+  {title:'상담 & 기획',desc:'온라인 상담, 취향 분석, 컬렉션을 확인하고 방향을 결정합니다'},
+  {title:'디자인 시안',desc:'3가지 시안을 시작으로 수정을 거쳐 최종 2개 안에 확정합니다'},
+  {title:'교정 & 확정',desc:'최종 교정 샘플을 발송하고, 최적의 인쇄 옵션을 결정합니다'},
+  {title:'제작 & 배송',desc:'QC 검수 후 안전 포장으로 배송합니다 (제작 7~10일)'},
+];
+
+const defaultReviews = [
+  {name:'김*연 & 이*호',date:'2026.02 | Rosé Garden Collection',text:'디자이너분이 저희 분위기를 딱 파악해 주셔서, 첫 시안에서부터 마음에 들었어요. 하객분들도 청첩장이 너무 예쁘다고 칭찬해 주셨어요!'},
+  {name:'박*진 & 최*아',date:'2026.01 | Midnight Luxe Collection',text:'골드 포일과 엠보 고급 옵션을 넣었는데 정말 만족스럽습니다. 럭셔리한 느낌을 원했던 분께 딱인 청첩장이에요!'},
+  {name:'정*현 & 한*지',date:'2025.12 | Golden Hour Collection',text:'처음 온라인으로 주문해서 걱정했는데 확정 전에 꼼꼼하게 확인해주시고, 배송도 빠르게 와서 감동받았습니다.'},
+];
+
+let collections = JSON.parse(localStorage.getItem('atelier_collections') || 'null') || defaultCollections;
+let process_steps = JSON.parse(localStorage.getItem('atelier_process') || 'null') || defaultProcess;
+let reviews = JSON.parse(localStorage.getItem('atelier_reviews') || 'null') || defaultReviews;
+
+// ── AUTH ──
+function doLogin(){
+  const v = document.getElementById('pw-input').value;
+  if(v === PW){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-screen').style.display='block';
+    renderAll();
+  } else {
+    document.getElementById('login-error').style.display='block';
+  }
+}
+
+function doLogout(){
+  document.getElementById('admin-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('pw-input').value='';
+  document.getElementById('login-error').style.display='none';
+}
+
+function changePassword(){
+  const cur=document.getElementById('pw-current').value;
+  const nw=document.getElementById('pw-new').value;
+  const cf=document.getElementById('pw-confirm').value;
+  const msg=document.getElementById('pw-msg');
+  if(cur!==PW){msg.style.color='#A32D2D';msg.textContent='현재 비밀번호가 올바르지 않습니다';return}
+  if(nw!==cf){msg.style.color='#A32D2D';msg.textContent='새 비밀번호가 일치하지 않습니다';return}
+  if(nw.length<4){msg.style.color='#A32D2D';msg.textContent='비밀번호는 4자 이상이어야 합니다';return}
+  PW=nw;
+  localStorage.setItem('atelier_pw',PW);
+  msg.style.color='#3B6D11';msg.textContent='비밀번호가 변경되었습니다';
+  document.getElementById('pw-current').value='';
+  document.getElementById('pw-new').value='';
+  document.getElementById('pw-confirm').value='';
+}
+
+// ── TABS ──
+function showTab(id, el){
+  document.querySelectorAll('.tab-section').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+// ── RENDER ──
+function renderAll(){
+  renderCollections();
+  renderProcess();
+  renderReviews();
+  updateStats();
+}
+
+function renderCollections(){
+  const grid=document.getElementById('collection-grid');
+  grid.innerHTML=collections.map((c,i)=>`
+    <div class="collection-card">
+      <div class="collection-card-img">
+        <span>${c.emoji}</span>
+        ${c.img?`<img src="${c.img}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`:''}
+      </div>
+      <div class="collection-card-body">
+        <div class="form-row" style="margin-bottom:8px">
+          <label class="form-label">컬렉션명</label>
+          <input class="form-input" value="${c.name}" onchange="collections[${i}].name=this.value">
+        </div>
+        <div class="form-row" style="margin-bottom:8px">
+          <label class="form-label">가격</label>
+          <input class="form-input" value="${c.price}" onchange="collections[${i}].price=this.value">
+        </div>
+        <div class="form-row" style="margin-bottom:8px">
+          <label class="form-label">태그</label>
+          <input class="form-input" value="${c.tags||''}" onchange="collections[${i}].tags=this.value">
+        </div>
+        <div class="form-row" style="margin-bottom:10px">
+          <label class="form-label">이미지 업로드</label>
+          <div class="img-upload-area" style="padding:12px" onclick="document.getElementById('col-img-${i}').click()">
+            <input type="file" id="col-img-${i}" accept="image/*" style="display:none" onchange="uploadCollectionImg(this,${i})">
+            <div style="font-size:11px;color:var(--warm-gray)">${c.img?'✓ 이미지 등록됨 (클릭하여 변경)':'클릭하여 이미지 업로드'}</div>
+          </div>
+        </div>
+        <div class="collection-card-actions">
+          <button class="btn btn-outline btn-sm" onclick="saveCollections()">저장</button>
+          <button class="btn btn-danger" onclick="deleteCollection(${i})">삭제</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderProcess(){
+  const list=document.getElementById('process-list');
+  list.innerHTML=process_steps.map((p,i)=>`
+    <div class="process-item">
+      <div class="process-num">${String(i+1).padStart(2,'0')}</div>
+      <div style="flex:1">
+        <div class="form-row" style="margin-bottom:8px">
+          <label class="form-label">단계 제목</label>
+          <input class="form-input" value="${p.title}" onchange="process_steps[${i}].title=this.value">
+        </div>
+        <div class="form-row" style="margin-bottom:0">
+          <label class="form-label">설명</label>
+          <textarea class="form-textarea" style="min-height:60px" onchange="process_steps[${i}].desc=this.value">${p.desc}</textarea>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderReviews(){
+  const list=document.getElementById('review-list');
+  list.innerHTML=reviews.map((r,i)=>`
+    <div class="review-item">
+      <div class="review-header">
+        <div>
+          <div class="review-stars">★★★★★</div>
+          <div class="review-name">${r.name} · ${r.date}</div>
+        </div>
+        <button class="btn btn-danger" onclick="deleteReview(${i})">삭제</button>
+      </div>
+      <div class="form-row" style="margin-bottom:8px">
+        <label class="form-label">이름</label>
+        <input class="form-input" value="${r.name}" onchange="reviews[${i}].name=this.value">
+      </div>
+      <div class="form-row" style="margin-bottom:8px">
+        <label class="form-label">날짜 & 컬렉션</label>
+        <input class="form-input" value="${r.date}" onchange="reviews[${i}].date=this.value">
+      </div>
+      <div class="form-row" style="margin-bottom:8px">
+        <label class="form-label">후기 내용</label>
+        <textarea class="form-textarea" style="min-height:60px" onchange="reviews[${i}].text=this.value">${r.text}</textarea>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="saveReviews()">저장</button>
+    </div>
+  `).join('');
+}
+
+function updateStats(){
+  document.getElementById('stat-collections').textContent=collections.length;
+  document.getElementById('stat-reviews').textContent=reviews.length;
+  const now=new Date();
+  document.getElementById('stat-lastSave').textContent=
+    now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+}
+
+// ── ACTIONS ──
+function addCollection(){
+  collections.push({emoji:'✦',name:'새 컬렉션',price:'0원~',tags:'',img:''});
+  renderCollections();
+  showToast('컬렉션이 추가되었습니다');
+}
+
+function deleteCollection(i){
+  if(!confirm('이 컬렉션을 삭제하시겠습니까?')) return;
+  collections.splice(i,1);
+  renderCollections();
+  saveCollections();
+  showToast('컬렉션이 삭제되었습니다');
+}
+
+function addReview(){
+  const name=document.getElementById('new-review-name').value.trim();
+  const date=document.getElementById('new-review-date').value.trim();
+  const text=document.getElementById('new-review-text').value.trim();
+  if(!name||!text){showToast('이름과 후기 내용을 입력해주세요');return}
+  reviews.push({name,date,text});
+  renderReviews();
+  saveReviews();
+  document.getElementById('new-review-name').value='';
+  document.getElementById('new-review-date').value='';
+  document.getElementById('new-review-text').value='';
+  showToast('후기가 추가되었습니다');
+}
+
+function deleteReview(i){
+  if(!confirm('이 후기를 삭제하시겠습니까?')) return;
+  reviews.splice(i,1);
+  renderReviews();
+  saveReviews();
+  showToast('후기가 삭제되었습니다');
+}
+
+function saveCollections(){
+  localStorage.setItem('atelier_collections',JSON.stringify(collections));
+  updateStats();
+  showToast('컬렉션이 저장되었습니다');
+}
+
+function saveReviews(){
+  localStorage.setItem('atelier_reviews',JSON.stringify(reviews));
+  updateStats();
+  showToast('후기가 저장되었습니다');
+}
+
+function saveSection(name){
+  localStorage.setItem('atelier_process',JSON.stringify(process_steps));
+  updateStats();
+  showToast(name+' 저장 완료');
+}
+
+function saveAll(){
+  localStorage.setItem('atelier_collections',JSON.stringify(collections));
+  localStorage.setItem('atelier_process',JSON.stringify(process_steps));
+  localStorage.setItem('atelier_reviews',JSON.stringify(reviews));
+  updateStats();
+  showToast('전체 저장 완료');
+}
+
+// ── IMAGE ──
+function triggerUpload(id){document.getElementById(id).click()}
+
+function previewImage(input,previewId){
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById(previewId);
+    img.src=e.target.result;
+    img.style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function uploadCollectionImg(input,i){
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    collections[i].img=e.target.result;
+    renderCollections();
+    showToast('이미지가 업로드되었습니다');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── TOAST ──
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+</script>
+</body>
+</html>
